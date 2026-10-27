@@ -36,7 +36,12 @@ export function FooterNavigation() {
               </Link>
             </li>
           ))}
-        </ul>
+          <li>
+              <Link href="/student-life/brain-games" className="hover:text-[#d4af37] transition-colors flex items-center gap-1.5 font-bold text-[#38bdf8]">
+                🧠 Brain Challenge
+              </Link>
+            </li>
+          </ul>
       </div>
 
       <div>
