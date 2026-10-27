@@ -1,133 +1,150 @@
-﻿"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { siteConfig } from "@/lib/site-config";
+import React, { useState, useEffect } from 'react';
+import { Clock, MapPin } from 'lucide-react';
 
-type PrayerName = "Fajr" | "Dhuhr" | "Asr" | "Maghrib" | "Isha";
-
-interface PrayerEntry {
-  name: PrayerName;
-  time: string;
+interface PrayerTimings {
+  Fajr: string;
+  Dhuhr: string;
+  Asr: string;
+  Maghrib: string;
+  Isha: string;
 }
 
-type LoadState = "idle" | "loading" | "ready" | "setup" | "error";
-
-const PRAYER_ORDER: PrayerName[] = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-
-const DEFAULT_TIMES: PrayerEntry[] = PRAYER_ORDER.map((name) => ({ name, time: "—" }));
-
-function formatDateInLagos(date: Date): string {
-  return new Intl.DateTimeFormat("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: siteConfig.timezone,
-  }).format(date);
-}
-
-export function PrayerTimesCard() {
-  const endpoint = siteConfig.prayerTimes.apiEndpoint?.trim();
-  const apiKey = siteConfig.prayerTimes.apiKey?.trim();
-
-  // Initialize state directly from config to avoid synchronous setState inside useEffect
-  const [state, setState] = useState<LoadState>(endpoint ? "idle" : "setup");
-  const [times, setTimes] = useState<PrayerEntry[]>(DEFAULT_TIMES);
-  const [message, setMessage] = useState<string>(
-    endpoint
-      ? ""
-      : "Prayer times will appear here once a verified data source is configured for Maiduguri (Africa/Lagos)."
-  );
-  const [todayLabel] = useState<string>(() => formatDateInLagos(new Date()));
+export default function PrayerTimesCard() {
+  const [timings, setTimings] = useState<PrayerTimings | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
-    if (!endpoint) return;
-
-    let cancelled = false;
-
-    async function loadPrayerTimes() {
+    async function fetchPrayerTimes() {
       try {
-        const headers: HeadersInit = {};
-        if (apiKey) {
-          headers["Authorization"] = `Bearer ${apiKey}`;
-        }
-
-        const response = await fetch(endpoint, { headers });
-
-        if (!response.ok) {
-          throw new Error(`Prayer times request failed (${response.status})`);
-        }
-
+        // Method 3 = Muslim World League (Commonly used in Nigeria)
+        const response = await fetch(
+          'https://api.aladhan.com/v1/timingsByCity?city=Maiduguri&country=Nigeria&method=3'
+        );
         const data = await response.json();
-        const raw = data?.times ?? data?.data?.timings ?? null;
-        if (!raw) {
-          throw new Error("Unexpected prayer times response shape");
+        if (data.code === 200) {
+          setTimings(data.data.timings);
+        } else {
+          setError(true);
         }
-
-        const parsed: PrayerEntry[] = PRAYER_ORDER.map((name) => ({
-          name,
-          time: String(raw[name] ?? "—"),
-        }));
-
-        if (!cancelled) {
-          setTimes(parsed);
-          setState("ready");
-          setMessage("Live prayer times for Maiduguri.");
-        }
-      } catch {
-        if (!cancelled) {
-          setState("error");
-          setMessage("Prayer times are temporarily unavailable. Please try again later.");
-          setTimes(DEFAULT_TIMES);
-        }
+      } catch (err) {
+        setError(true);
+      } finally {
+        setLoading(false);
       }
     }
 
-    void loadPrayerTimes();
+    fetchPrayerTimes();
+  }, []);
 
-    return () => {
-      cancelled = true;
-    };
-  }, [endpoint, apiKey]);
-
-  const nextPrayer: PrayerName | null = null;
+  const prayerIcons: Record<keyof PrayerTimings, string> = {
+    Fajr: 'Dawn',
+    Dhuhr: 'Noon',
+    Asr: 'Afternoon',
+    Maghrib: 'Sunset',
+    Isha: 'Night',
+  };
 
   return (
-    <aside className="prayer-card" aria-labelledby="prayer-times-heading">
-      <div className="prayer-card__header">
-        <h3 id="prayer-times-heading" className="prayer-card__title">
-          Prayer Times
-        </h3>
-        <p className="prayer-card__date">{todayLabel || "Maiduguri"}</p>
+    <div className="prayer-card">
+      <div className="prayer-header">
+        <div className="prayer-title-group">
+          <Clock size={20} className="text-gold" />
+          <h3 className="prayer-title">Prayer Times</h3>
+        </div>
+        <div className="prayer-location">
+          <MapPin size={14} />
+          <span>Maiduguri, Borno</span>
+        </div>
       </div>
 
-      <ul className="prayer-list" aria-live="polite">
-        {times.map((entry) => (
-          <li
-            key={entry.name}
-            className={
-              nextPrayer === entry.name ? "prayer-row prayer-row--next" : "prayer-row"
-            }
-          >
-            <span className="prayer-name">{entry.name}</span>
-            <span className="prayer-time">
-              {state === "loading" ? "Loading…" : entry.time}
-            </span>
-          </li>
-        ))}
-      </ul>
+      <div className="prayer-list">
+        {loading ? (
+          <div className="prayer-status">Updating timings...</div>
+        ) : error || !timings ? (
+          <div className="prayer-status error">Unable to load timings</div>
+        ) : (
+          (Object.keys(prayerIcons) as Array<keyof PrayerTimings>).map((key) => (
+            <div key={key} className="prayer-row">
+              <span className="prayer-name">{key}</span>
+              <span className="prayer-time">{timings[key]}</span>
+            </div>
+          ))
+        )}
+      </div>
 
-      <p
-        className={
-          state === "setup"
-            ? "prayer-status prayer-status--setup"
-            : state === "error"
-              ? "prayer-status prayer-status--error"
-              : "prayer-status"
+      <style jsx>{
+        .prayer-card {
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+          padding: 1.5rem;
+          color: white;
         }
-      >
-        {state === "loading" ? "Fetching prayer times…" : message}
-      </p>
-    </aside>
+        .prayer-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.5rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          padding-bottom: 1rem;
+        }
+        .prayer-title-group {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+        }
+        .prayer-title {
+          font-size: 1.1rem;
+          font-weight: 600;
+          letter-spacing: 0.5px;
+          margin: 0;
+        }
+        .prayer-location {
+          display: flex;
+          align-items: center;
+          gap: 0.4rem;
+          font-size: 0.75rem;
+          color: var(--sky-blue);
+          opacity: 0.8;
+        }
+        .prayer-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.85rem;
+        }
+        .prayer-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.25rem 0;
+        }
+        .prayer-name {
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.7);
+        }
+        .prayer-time {
+          font-family: monospace;
+          font-size: 1rem;
+          color: var(--gold);
+          font-weight: 600;
+        }
+        .prayer-status {
+          font-size: 0.85rem;
+          font-style: italic;
+          color: rgba(255, 255, 255, 0.5);
+          text-align: center;
+          padding: 1rem 0;
+        }
+        .error {
+          color: #ffbaba;
+        }
+        .text-gold {
+          color: var(--gold);
+        }
+      }</style>
+    </div>
   );
 }
