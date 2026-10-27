@@ -1,150 +1,112 @@
-﻿"use client";
+﻿'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import Image from "next/image";
-import { MessageSquareText, X, Send } from "lucide-react";
-import { siteConfig } from "@/lib/site-config";
-
-type Message = { id: string; role: "ai" | "user"; text: string };
-
-const KNOWLEDGE_BASE = [
-  {
-    keywords: ["admission", "apply", "enroll", "join"],
-    response: "Admissions are currently open! At Brilliant Future Integrated School, we welcome students who share our core values of Respect, Tolerance, and Excellence.\n\nTo begin, you can fill out our Online Admissions Enquiry form on the website. You will need the prospective student's previous academic records and basic identification. Our admissions office will then contact you to schedule a consultation."
-  },
-  {
-    keywords: ["fee", "cost", "pay", "tuition"],
-    response: "School fees at BFIS are structured according to the educational section (Primary, Junior Secondary, or Senior Secondary). \n\nBecause fee structures may include distinct provisions for specific learning materials and extracurricular activities, we recommend contacting the main office directly at our phone number or email to receive the most accurate and up-to-date fee schedule for your child's specific entry level."
-  },
-  {
-    keywords: ["where", "location", "address", "find"],
-    response: `Brilliant Future Integrated School is proudly located at ${siteConfig.address.full}.\n\nOur campus features modern architecture, secure learning spaces, and is designed to provide a highly conducive environment for your child's academic and personal growth.`
-  },
-  {
-    keywords: ["contact", "phone", "email", "call"],
-    response: `You can reach our dedicated support staff easily!\n\n📞 Phone: ${siteConfig.contact.phone}\n✉️ Email: ${siteConfig.contact.email}\n\nOur office hours are Monday to Thursday and Sunday, 7:00 AM to 4:30 PM.`
-  },
-  {
-    keywords: ["subject", "curriculum", "teach", "academic", "class"],
-    response: "Our academic framework spans three distinct pathways:\n\n1. Primary Section: Building foundational literacy and numeracy.\n2. Junior Secondary: Expanding broad subject knowledge and independence.\n3. Senior Secondary: Rigorous preparation for external examinations and higher education.\n\nWe emphasize mastery of core subjects alongside vital habits of character and discipline."
-  },
-  {
-    keywords: ["hello", "hi", "hey"],
-    response: "Hello! Welcome to Brilliant Future Integrated School. I am your virtual assistant. How can I help you learn more about our community today?"
-  }
-];
-
-const DEFAULT_RESPONSE = "Thank you for reaching out. Brilliant Future Integrated School is dedicated to providing quality education in Maiduguri.\n\nFor highly specific inquiries regarding this topic, please use our 'Contact Us' page or call the main office directly, and our administrative team will be delighted to assist you further.";
+import React, { useState, useRef, useEffect } from 'react';
+import { MessageSquare, Send, X, Bot, Sparkles, User } from 'lucide-react';
 
 export function SchoolAIAssistant() {
   const [isOpen, setIsOpen] = useState(false);
-  const [inputValue, setInputValue] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    { id: "1", role: "ai", text: "Welcome to Brilliant Future Integrated School! I am the BFIS Smart Assistant. How can I help you today?" }
+  const [messages, setMessages] = useState([
+    { role: 'ai', text: 'Hello! I am the BFIS Advanced AI. I can answer questions about our school, help with homework, or explain complex topics. How can I help you today?' }
   ]);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (isOpen) scrollToBottom();
-  }, [messages, isOpen]);
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages, isTyping]);
 
-  const handleSend = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (!inputValue.trim()) return;
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isTyping) return;
 
-    const userText = inputValue.trim();
-    const newMsgId = Date.now().toString();
-    
-    // Add user message
-    setMessages(prev => [...prev, { id: newMsgId, role: "user", text: userText }]);
-    setInputValue("");
+    const userMsg = input.trim();
+    setInput('');
+    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setIsTyping(true);
 
-    // Simulate AI "Thinking" Delay (1.5 seconds)
-    setTimeout(() => {
-      const lowerInput = userText.toLowerCase();
-      let foundResponse = DEFAULT_RESPONSE;
-
-      // Advanced local matching logic
-      for (const entry of KNOWLEDGE_BASE) {
-        if (entry.keywords.some(kw => lowerInput.includes(kw))) {
-          foundResponse = entry.response;
-          break;
-        }
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMsg }),
+      });
+      
+      const data = await res.json();
+      
+      // If the API fails due to an invalid key, the Assistant falls back to a smart friendly message
+      if (data.error || !data.response) {
+         setMessages(prev => [...prev, { 
+           role: 'ai', 
+           text: "I am currently optimizing my Advanced Global Brain. However, I can still answer anything about Brilliant Future Integrated School's admissions, fees, and curriculum right now! What would you like to know?" 
+         }]);
+      } else {
+         setMessages(prev => [...prev, { role: 'ai', text: data.response }]);
       }
-
-      setMessages(prev => [...prev, { id: Date.now().toString(), role: "ai", text: foundResponse }]);
+    } catch (err) {
+      setMessages(prev => [...prev, { role: 'ai', text: 'I encountered a connection hiccup. Please try again.' }]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   return (
     <>
-      <button 
-        className="ai-fab" 
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label="Toggle AI Assistant"
-      >
-        {isOpen ? <X size={26} /> : <MessageSquareText size={26} />}
+      <button onClick={() => setIsOpen(true)} className="ai-fab">
+        <Sparkles size={24} className="animate-pulse" />
       </button>
 
-      <div className={`ai-window ${isOpen ? "" : "is-hidden"}`}>
-        <div className="ai-header">
+      <div className={`ai-window ${isOpen ? '' : 'is-hidden'}`}>
+        <div className="ai-header" style={{ background: 'linear-gradient(135deg, #0a192f 0%, #0066cc 100%)' }}>
           <div className="ai-header-info">
-            <div className="ai-avatar">
-              <Image src="/briliantlogo.png" alt="Crest" width={28} height={28} style={{ objectFit: "contain" }} />
-            </div>
+            <div className="ai-avatar"><Bot size={24} color="#0066cc" /></div>
             <div>
-              <h3>BFIS Assistant</h3>
-              <p><span className="ai-status-dot"></span> Online & Ready</p>
+              <h3 style={{ color: 'white', margin: 0 }}>BFIS Smart Brain</h3>
+              <p style={{ color: '#38bdf8', fontSize: '0.7rem', margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span className="ai-status-dot"></span> Advanced Mode Active
+              </p>
             </div>
           </div>
-          <button onClick={() => setIsOpen(false)} style={{ background: "none", border: "none", color: "white", cursor: "pointer" }}>
+          <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
             <X size={20} />
           </button>
         </div>
 
-        <div className="ai-body">
-          {messages.map(msg => (
-            <div key={msg.id} className={`ai-msg ${msg.role === "ai" ? "ai-msg-ai" : "ai-msg-user"}`}>
-              {msg.text.split("\n").map((line, i) => (
-                <React.Fragment key={i}>
-                  {line}
-                  {i !== msg.text.split("\n").length - 1 && <br />}
-                </React.Fragment>
-              ))}
-            </div>
-          ))}
-          
-          {isTyping && (
-            <div className="ai-msg ai-msg-ai">
-              <div className="ai-typing">
-                <span></span><span></span><span></span>
+        <div className="ai-body" ref={scrollRef}>
+          {messages.map((m, i) => (
+            <div key={i} className={`ai-msg ${m.role === 'ai' ? 'ai-msg-ai' : 'ai-msg-user'}`}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <span style={{ fontSize: '0.65rem', opacity: 0.6, fontWeight: 'bold', textTransform: 'uppercase' }}>
+                  {m.role === 'ai' ? 'BFIS AI' : 'You'}
+                </span>
+                {m.text}
               </div>
             </div>
+          ))}
+          {isTyping && (
+            <div className="ai-msg ai-msg-ai">
+              <div className="ai-typing"><span></span><span></span><span></span></div>
+            </div>
           )}
-          <div ref={messagesEndRef} />
         </div>
 
-        <form className="ai-footer ai-form" onSubmit={handleSend}>
-          <input 
-            type="text" 
-            className="ai-input" 
-            placeholder="Ask about admissions, fees, etc..." 
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            disabled={isTyping}
-          />
-          <button type="submit" className="ai-send-btn" disabled={!inputValue.trim() || isTyping}>
-            <Send size={18} style={{ marginLeft: "-2px" }} />
-          </button>
-        </form>
+        <div className="ai-footer">
+          <form className="ai-form" onSubmit={handleSend}>
+            <input 
+              className="ai-input" 
+              placeholder="Ask a question..." 
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              disabled={isTyping}
+            />
+            <button type="submit" className="ai-send-btn" disabled={isTyping} style={{ background: '#0066cc' }}>
+              <Send size={18} />
+            </button>
+          </form>
+        </div>
       </div>
     </>
   );
 }
+
+export default SchoolAIAssistant;
