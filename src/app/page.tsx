@@ -1,69 +1,43 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+﻿import type { Metadata } from "next";
+import { HeroSection } from "@/components/home/HeroSection";
+import { SchoolIntroduction } from "@/components/home/SchoolIntroduction";
+import { SchoolValues } from "@/components/home/SchoolValues";
+import { QuickAccess } from "@/components/home/QuickAccess";
+import { SchoolSections } from "@/components/home/SchoolSections";
+import { AcademicHighlights } from "@/components/home/AcademicHighlights";
+import { LeadershipPreview } from "@/components/home/LeadershipPreview";
+import { AdmissionsSection } from "@/components/home/AdmissionsSection";
+import { StudentLifeSection } from "@/components/home/StudentLifeSection";
+import { NewsPreview } from "@/components/home/NewsPreview";
+import { GalleryPreview } from "@/components/home/GalleryPreview";
+import { FaqPreview } from "@/components/home/FaqPreview";
+import { ContactPreview } from "@/components/home/ContactPreview";
+import { SchoolVideoSection } from "@/components/home/SchoolVideoSection";
 
-export default function Home() {
+export const metadata: Metadata = {
+  title: "Home",
+  description:
+    "Brilliant Future Integrated School in Maiduguri, Borno State — quality primary and secondary education guided by Respect, Tolerance and Excellence.",
+};
+
+export default function HomePage() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main id="main-content">
+      <HeroSection />
+      <SchoolIntroduction />
+      <SchoolValues />
+      <QuickAccess />
+      <SchoolSections />
+      <AcademicHighlights />
+      <LeadershipPreview />
+      <AdmissionsSection />
+      <StudentLifeSection />
+      <NewsPreview />
+      <GalleryPreview />
+      <FaqPreview />
+      <ContactPreview />
+      <SchoolVideoSection />
+    </main>
   );
 }
+
