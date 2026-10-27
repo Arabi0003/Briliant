@@ -1,32 +1,26 @@
-﻿import type { Metadata } from "next";
-import { Container } from "@/components/ui/Container";
+import React from 'react';
+import { PageHeader } from '@/components/ui/PageHeader';
+import { AuthLoginCard } from '@/components/auth/AuthLoginCard';
 
-export const metadata: Metadata = {
-  title: "Staff Portal - SMS Access",
-  description: "Secure login portal for Brilliant Future Integrated School.",
+export const metadata = {
+  title: "Staff Portal | Brilliant Future Integrated School",
+  description: "Manage attendance, enter scores, and HR docs.",
 };
 
-export default function PortalAccess() {
+export default function StaffPortalPage() {
   return (
-    <main id="main-content" style={{ minHeight: "80vh", display: "flex", alignItems: "center", background: "var(--color-neutral-50)" }}>
-      <Container>
-        <div style={{ maxWidth: "500px", marginInline: "auto", background: "var(--color-white)", padding: "3rem", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-xl)", textAlign: "center", borderTop: "6px solid var(--color-royal)" }}>
-          <span style={{ color: "var(--color-gold-light)", fontWeight: 700, textTransform: "uppercase", letterSpacing: "1px", fontSize: "0.85rem" }}>
-            School Management System
-          </span>
-          <h1 style={{ color: "var(--color-navy)", fontSize: "2rem", marginBlock: "1rem" }}>Staff Portal</h1>
-          <p style={{ color: "var(--color-neutral-600)", lineHeight: 1.6, marginBottom: "2rem" }}>
-            Manage classes, grading, and administrative tasks.
-          </p>
-          
-          <div style={{ padding: "1.5rem", background: "var(--color-pale-blue)", borderRadius: "var(--radius-md)", border: "1px dashed var(--color-sky-light)" }}>
-            <p style={{ color: "var(--color-royal-dark)", fontSize: "0.95rem", fontWeight: 500 }}>
-              🔒 Secure Authentication required.<br/><br/>
-              This interface prepares the architecture for the future database-driven School Management System (SMS). Login credentials will be issued by the school administration once the database phase is deployed.
-            </p>
-          </div>
-        </div>
-      </Container>
+    <main>
+      <PageHeader 
+        title="Staff Portal"
+        subtitle="Manage attendance, enter scores, and HR docs."
+      />
+      <div className="auth-wrapper">
+        <AuthLoginCard 
+          role="Staff" 
+          title="Staff Portal Login"
+          subtitle="Enter your secure credentials to continue."
+        />
+      </div>
     </main>
   );
 }

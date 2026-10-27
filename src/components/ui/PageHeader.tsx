@@ -1,20 +1,25 @@
-﻿import React from "react";
-import { Container } from "@/components/ui/Container";
+'use client';
 
-interface PageHeaderProps {
+import React from 'react';
+
+export interface PageHeaderProps {
   title: string;
-  description?: string;
+  subtitle?: string;
   eyebrow?: string;
+  description?: string;
 }
 
-export function PageHeader({ title, description, eyebrow }: PageHeaderProps) {
+export function PageHeader({ title, subtitle, eyebrow, description }: PageHeaderProps) {
+  const displaySubtitle = subtitle || description;
   return (
-    <header className="page-header watermark-container">
-      <Container>
-        {eyebrow && <span className="section-heading__eyebrow" style={{ color: "var(--color-gold-light)" }}>{eyebrow}</span>}
+    <section className="page-header watermark-container">
+      <div className="container">
+        {eyebrow && <span className="brand-subtitle" style={{ color: '#d4af37', marginBottom: '0.5rem', display: 'block' }}>{eyebrow}</span>}
         <h1>{title}</h1>
-        {description && <p>{description}</p>}
-      </Container>
-    </header>
+        {displaySubtitle && <p>{displaySubtitle}</p>}
+      </div>
+    </section>
   );
 }
+
+export default PageHeader;
