@@ -1,72 +1,79 @@
 ﻿export interface NavItem {
-  label: string;
+  title: string;
   href: string;
-  description?: string;
+  children?: NavItem[];
 }
 
-export interface NavGroup {
-  label: string;
-  items: NavItem[];
-}
-
-export const primaryNav: NavGroup[] = [
+export const primaryNav: NavItem[] = [
+  { title: 'Home', href: '/' },
   {
-    label: "Our School",
-    items: [
-      { label: "About the School", href: "/about", description: "Our history and commitment to excellence" },
-      { label: "Vision and Mission", href: "/vision-mission", description: "The principles that guide us" },
-      { label: "School Facilities", href: "/facilities", description: "Campus infrastructure" },
-      { label: "School Policies", href: "/policies", description: "Guidelines and regulations" },
+    title: 'About Us',
+    href: '/about',
+    children: [
+      { title: 'Overview', href: '/about' },
+      { title: 'Mission & Vision', href: '/about/mission-vision' },
+      { title: 'Leadership & Board', href: '/about/leadership' },
+      { title: 'Crest, Motto & Anthem', href: '/about/crest-anthem' },
+      { title: 'School History', href: '/about/history' },
+      { title: 'Campus Facilities', href: '/about/facilities' },
     ],
   },
   {
-    label: "Academics",
-    items: [
-      { label: "Primary Section", href: "/academics/primary", description: "Foundation years" },
-      { label: "Junior Secondary", href: "/academics/junior-secondary", description: "Building confidence" },
-      { label: "Senior Secondary", href: "/academics/senior-secondary", description: "Preparing for higher education" },
-      { label: "Curriculum & Subjects", href: "/academics/curriculum", description: "What we teach" },
-      { label: "Academic Calendar", href: "/academics/calendar", description: "Key dates and terms" },
+    title: 'Academics',
+    href: '/academics',
+    children: [
+      { title: 'Overview', href: '/academics' },
+      { title: 'Early Childhood', href: '/academics/early-childhood' },
+      { title: 'Primary School', href: '/academics/primary' },
+      { title: 'Junior Secondary', href: '/academics/junior-secondary' },
+      { title: 'Senior Secondary', href: '/academics/senior-secondary' },
+      { title: 'Islamic & Tahfeez', href: '/academics/islamic-studies' },
+      { title: 'STEM & Robotics', href: '/academics/stem-innovations' },
+      { title: 'Academic Calendar', href: '/academics/calendar' },
     ],
   },
   {
-    label: "People",
-    items: [
-      { label: "School Leadership", href: "/people/leadership", description: "Our management team" },
-      { label: "Teaching Staff", href: "/people/teachers", description: "Dedicated educators" },
-      { label: "Student Community", href: "/people/students", description: "Life at BFIS" },
+    title: 'Admissions',
+    href: '/admissions',
+    children: [
+      { title: 'Overview', href: '/admissions' },
+      { title: 'Admissions Process', href: '/admissions/process' },
+      { title: 'Requirements & Age', href: '/admissions/requirements' },
+      { title: 'Fee Structure', href: '/admissions/fee-structure' },
+      { title: 'Apply Online', href: '/admissions/apply-online' },
+      { title: 'Transfer Students', href: '/admissions/transfer' },
+      { title: 'Admissions FAQ', href: '/admissions/faq' },
     ],
   },
   {
-    label: "Admissions",
-    items: [
-      { label: "Overview", href: "/admissions", description: "How to join our school" },
-      { label: "Requirements", href: "/admissions/requirements", description: "Entry criteria" },
-      { label: "Online Enquiry", href: "/admissions/enquiry", description: "Submit an enquiry" },
+    title: 'Portals',
+    href: '/portals/student',
+    children: [
+      { title: 'Student SMS Portal', href: '/portals/student' },
+      { title: 'Parent SMS Portal', href: '/portals/parent' },
+      { title: 'Staff SMS Portal', href: '/portals/staff' },
+      { title: 'Admin SMS Portal', href: '/portals/admin' },
     ],
   },
   {
-    label: "Student Life",
-    items: [
-      { label: "Activities", href: "/student-life/activities", description: "Clubs and sports" },
-      { label: "Gallery", href: "/gallery", description: "Photographs of school life" },
-      { label: "News", href: "/news", description: "Announcements" },
+    title: 'News & Events',
+    href: '/news',
+    children: [
+      { title: 'School News', href: '/news' },
+      { title: 'Upcoming Events', href: '/news/events' },
+      { title: 'Photo Gallery', href: '/news/gallery' },
+      { title: 'Termly Newsletter', href: '/news/newsletter' },
     ],
   },
   {
-    label: "Portals",
-    items: [
-      { label: "Student Portal", href: "/portals/student", description: "SMS Access for Students" },
-      { label: "Parent Portal", href: "/portals/parent", description: "SMS Access for Parents" },
-      { label: "Staff Portal", href: "/portals/staff", description: "SMS Access for Teachers" },
-      { label: "Admin Login", href: "/portals/admin", description: "School Management System" },
+    title: 'Contact',
+    href: '/contact',
+    children: [
+      { title: 'Contact Us', href: '/contact' },
+      { title: 'Location & Map', href: '/contact/location-map' },
+      { title: 'Career Opportunities', href: '/contact/careers' },
     ],
   },
 ];
 
-export const quickLinks: NavItem[] = [
-  { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Admissions", href: "/admissions" },
-  { label: "Contact", href: "/contact" },
-];
+export const MAIN_NAVIGATION = primaryNav;

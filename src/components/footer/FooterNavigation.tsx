@@ -1,39 +1,61 @@
-﻿import Link from "next/link";
-import { primaryNav } from "@/lib/navigation";
+﻿import React from 'react';
+import Link from 'next/link';
+import { primaryNav, NavItem } from '@/lib/navigation';
 
 export function FooterNavigation() {
-  const schoolLinks = primaryNav.find((g) => g.label === "Our School")?.items ?? [];
-  const academicLinks = primaryNav.find((g) => g.label === "Academics")?.items.slice(0, 5) ?? [];
-  const admissionLinks = primaryNav.find((g) => g.label === "Admissions")?.items ?? [];
+  const aboutLinks = primaryNav.find((item: NavItem) => item.title === 'About Us')?.children || [];
+  const academicLinks = primaryNav.find((item: NavItem) => item.title === 'Academics')?.children || [];
+  const portalLinks = primaryNav.find((item: NavItem) => item.title === 'Portals')?.children || [];
 
   return (
-    <>
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
       <div>
-        <h3 className="footer-heading">Our School</h3>
-        <nav className="footer-links" aria-label="Footer school links">
-          {schoolLinks.map((item) => (
-            <Link key={item.href} href={item.href}>
-              {item.label}
-            </Link>
+        <h4 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase border-b border-gray-700 pb-2">
+          About BFIS
+        </h4>
+        <ul className="space-y-2 text-sm text-gray-300">
+          {aboutLinks.slice(0, 6).map((subItem: NavItem) => (
+            <li key={subItem.href}>
+              <Link href={subItem.href} className="hover:text-[#d4af37] transition-colors">
+                {subItem.title}
+              </Link>
+            </li>
           ))}
-        </nav>
+        </ul>
       </div>
 
       <div>
-        <h3 className="footer-heading">Academics & Admissions</h3>
-        <nav className="footer-links" aria-label="Footer academics and admissions">
-          {academicLinks.map((item) => (
-            <Link key={item.href} href={item.href}>
-              {item.label}
-            </Link>
+        <h4 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase border-b border-gray-700 pb-2">
+          Academics
+        </h4>
+        <ul className="space-y-2 text-sm text-gray-300">
+          {academicLinks.slice(0, 6).map((subItem: NavItem) => (
+            <li key={subItem.href}>
+              <Link href={subItem.href} className="hover:text-[#d4af37] transition-colors">
+                {subItem.title}
+              </Link>
+            </li>
           ))}
-          {admissionLinks.map((item) => (
-            <Link key={item.href} href={item.href}>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        </ul>
       </div>
-    </>
+
+      <div>
+        <h4 className="text-white font-semibold mb-4 text-sm tracking-wider uppercase border-b border-gray-700 pb-2">
+          SMS Gateways
+        </h4>
+        <ul className="space-y-2 text-sm text-gray-300">
+          {portalLinks.map((subItem: NavItem) => (
+            <li key={subItem.href}>
+              <Link href={subItem.href} className="hover:text-[#d4af37] transition-colors flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#d4af37] inline-block"></span>
+                {subItem.title}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
+
+export default FooterNavigation;
